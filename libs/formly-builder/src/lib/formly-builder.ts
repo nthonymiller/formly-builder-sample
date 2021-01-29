@@ -1,4 +1,5 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { MonoTypeOperatorFunction } from './types';
 
 export type Obj = { [key: string]: any };
 
@@ -8,10 +9,19 @@ export interface Builder {
 
 export class FieldBuilder<T> implements Builder {
 
+  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
+
   constructor(public key: T) { }
 
   public build(): FormlyFieldConfig {
+    // Todo: Include operations from withProps
+
     return { key: this.key as unknown as string };
+  }
+
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): FieldBuilder<T> {
+    this.operations = operations;
+    return this;
   }
 }
 
@@ -44,14 +54,23 @@ export abstract class GroupBuildBase<T extends Obj = any> {
 
 export class GroupBuilder<T extends Obj = any> extends GroupBuildBase<T> implements Builder {
 
+  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
+
   constructor(public key: string | number | any) {
     super()
   }
 
   public build(): FormlyFieldConfig {
+    // Todo: Include operations from withProps
+
     const fieldGroup = buildGroup(this, this._builders);
     const result: FormlyFieldConfig = { key: this.key, fieldGroup };
     return result;
+  }
+
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): GroupBuilder<T> {
+    this.operations = operations;
+    return this;
   }
 }
 

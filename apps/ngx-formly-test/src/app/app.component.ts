@@ -33,7 +33,7 @@ export class AppComponent {
 
     builder.group('address').withFields(group => [
       group.field('addressLine1')
-    ])
+    ]);
 
 
   }
