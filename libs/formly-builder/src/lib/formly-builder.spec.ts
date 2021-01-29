@@ -1,4 +1,4 @@
-import { FormlyBuilder } from './formly-builder';
+import { FieldBuilder, FormlyBuilder, GroupBuilder } from './formly-builder';
 
 export interface UserModel {
   firstName: string;
@@ -14,87 +14,132 @@ export interface Address {
 }
 
 
-describe('FormlyBuilder', () => {
+describe('Builders', () => {
 
-  let formlyBuilder: FormlyBuilder<UserModel>;
+  describe('FieldBuilder', () => {
 
-  beforeEach(() => {
-    formlyBuilder = new FormlyBuilder<UserModel>();
+    it('should create field', () => {
+      const fieldBuilder = new FieldBuilder('name');
+
+      expect(fieldBuilder).toBeDefined();
+      expect(fieldBuilder.key).toEqual('name');
+    });
+
+    it('should build field with name', () => {
+      const fieldBuilder = new FieldBuilder('name');
+
+      const config = fieldBuilder.build();
+
+      expect(config).toEqual({ key: 'name' });
+    });
+
   });
 
-  it('should build user form using field', () => {
-    formlyBuilder.field('firstName');
-    formlyBuilder.field('lastName');
-    formlyBuilder.field('email');
+  describe('GroupBuilder', () => {
 
-    const config = formlyBuilder.build();
+    it('should create group', () => {
+      const groupBuilder = new GroupBuilder('name');
 
-    expect(config).toEqual([
-      { key: 'firstName'},
-      { key: 'lastName'},
-      { key: 'email' }
-    ]);
+      expect(groupBuilder).toBeDefined();
+    });
+
+    it('should create group with name', () => {
+      const groupBuilder = new GroupBuilder('name');
+
+      const config = groupBuilder.build();
+
+      expect(config).toEqual({ key: 'name', fieldGroup: [] });
+    })
+
   });
 
-  it('should build user form using withFields', () => {
-    formlyBuilder.withFields(group => [
-      group.field('firstName'),
-      group.field('lastName'),
-      group.field('email')
-    ]);
 
-    const config = formlyBuilder.build();
+  describe('FormlyBuilder', () => {
 
-    expect(config).toEqual([
-      { key: 'firstName'},
-      { key: 'lastName'},
-      { key: 'email' }
-    ]);
-  });
+    let formlyBuilder: FormlyBuilder<UserModel>;
 
-  it('should build user form using with address fields', () => {
-    formlyBuilder.withFields(group => [
-      group.field('firstName'),
-      group.field('lastName'),
-      group.field('email'),
-    ]);
+    beforeEach(() => {
+      formlyBuilder = new FormlyBuilder<UserModel>();
+    });
 
-    formlyBuilder.group('address').withFields(group => [
-      group.field('addressLine1'),
-      group.field('city'),
-      group.field('zip')
-    ])
+    it('should create form builder', () => {
+      expect(formlyBuilder).toBeDefined();
+    });
 
-    const config = formlyBuilder.build();
+    it('should build user form using field', () => {
+      formlyBuilder.field('firstName');
+      formlyBuilder.field('lastName');
+      formlyBuilder.field('email');
 
-    expect(config).toEqual([
-      { key: 'firstName'},
-      { key: 'lastName'},
-      { key: 'email' },
-      { key: 'address', fieldGroup: [{ key: 'addressLine1'}, { key: 'city'}, { key: 'zip'} ]}
-    ]);
-  });
+      const config = formlyBuilder.build();
 
-  it('should build user form using with address fields using chaining', () => {
-    formlyBuilder.withFields(group => [
-      group.field('firstName'),
-      group.field('lastName'),
-      group.field('email'),
-      group.group('address').withFields(ga => [
-        ga.field('addressLine1'),
-        ga.field('city'),
-        ga.field('zip')
+      expect(config).toEqual([
+        { key: 'firstName'},
+        { key: 'lastName'},
+        { key: 'email' }
+      ]);
+    });
+
+    it('should build user form using withFields', () => {
+      formlyBuilder.withFields(group => [
+        group.field('firstName'),
+        group.field('lastName'),
+        group.field('email')
+      ]);
+
+      const config = formlyBuilder.build();
+
+      expect(config).toEqual([
+        { key: 'firstName'},
+        { key: 'lastName'},
+        { key: 'email' }
+      ]);
+    });
+
+    it('should build user form using with address fields', () => {
+      formlyBuilder.withFields(group => [
+        group.field('firstName'),
+        group.field('lastName'),
+        group.field('email'),
+      ]);
+
+      formlyBuilder.group('address').withFields(group => [
+        group.field('addressLine1'),
+        group.field('city'),
+        group.field('zip')
       ])
-    ]);
 
-    const config = formlyBuilder.build();
+      const config = formlyBuilder.build();
 
-    expect(config).toEqual([
-      { key: 'firstName'},
-      { key: 'lastName'},
-      { key: 'email' },
-      { key: 'address', fieldGroup: [{ key: 'addressLine1'}, { key: 'city'}, { key: 'zip'} ]}
-    ]);
+      expect(config).toEqual([
+        { key: 'firstName'},
+        { key: 'lastName'},
+        { key: 'email' },
+        { key: 'address', fieldGroup: [{ key: 'addressLine1'}, { key: 'city'}, { key: 'zip'} ]}
+      ]);
+    });
+
+    it('should build user form using with address fields using chaining', () => {
+      formlyBuilder.withFields(group => [
+        group.field('firstName'),
+        group.field('lastName'),
+        group.field('email'),
+        group.group('address').withFields(ga => [
+          ga.field('addressLine1'),
+          ga.field('city'),
+          ga.field('zip')
+        ])
+      ]);
+
+      const config = formlyBuilder.build();
+
+      expect(config).toEqual([
+        { key: 'firstName'},
+        { key: 'lastName'},
+        { key: 'email' },
+        { key: 'address', fieldGroup: [{ key: 'addressLine1'}, { key: 'city'}, { key: 'zip'} ]}
+      ]);
+    });
+
   });
-
-})
+});
