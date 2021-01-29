@@ -10,32 +10,27 @@ export class FieldBuilder<T> implements Builder {
 
   constructor(public key: T) { }
 
-  build(): FormlyFieldConfig {
+  public build(): FormlyFieldConfig {
     return { key: this.key as unknown as string };
   }
 }
 
-export class GroupBuilder<T extends Obj = any> implements Builder {
 
-  private _builders = [];
+export abstract class GroupBuildBase<T extends Obj = any> {
 
-  constructor(key?: string | number | any) { }
+  protected _builders: Array<any> = [];
 
-  field<K extends keyof T>(key: K): any {
+  public field<K extends keyof T>(key: K): FieldBuilder<any> {
     return this.addBuilder(new FieldBuilder(key));
   }
 
-  withFields<R extends Builder, K = this>(project: (value: K) => R[]): GroupBuilder {
+  public withFields<R extends Builder, K = this>(project: (value: K) => R[]): GroupBuildBase {
     this.addBuilder(project);
     return this;
   }
 
-  group<K extends keyof T>(key: K): GroupBuilder<T[K]> {
+  public group<K extends keyof T>(key: K): GroupBuilder<T[K]> {
     return this.addBuilder(new GroupBuilder<T[K]>(key));
-  }
-
-  build(): FormlyFieldConfig[] {
-    return [];
   }
 
   protected addBuilder<U>(value: U): U {
@@ -43,13 +38,43 @@ export class GroupBuilder<T extends Obj = any> implements Builder {
     return value;
   }
 
+  abstract build(): any;
+
 }
 
+export class GroupBuilder<T extends Obj = any> extends GroupBuildBase<T> implements Builder {
 
-export class FormlyBuilder<T extends Obj = any> extends GroupBuilder<T> implements Builder {
-
-  constructor() {
+  constructor(public key: string | number | any) {
     super()
   }
 
+  public build(): FormlyFieldConfig {
+    const fieldGroup = buildGroup(this, this._builders);
+    const result: FormlyFieldConfig = { key: this.key, fieldGroup };
+    return result;
+  }
+}
+
+
+export class FormlyBuilder<T extends Obj = any> extends GroupBuildBase<T> implements Builder {
+
+  public build(): FormlyFieldConfig[] {
+    return buildGroup(this, this._builders);
+  }
+
+}
+
+export function buildGroup(current: Builder, builders: Array<any>): FormlyFieldConfig[] {
+  const result = [];
+
+  builders.forEach(builder => {
+    if (builder instanceof Function) {
+      const projectorBuilders = builder(current) as Array<Builder>;
+      result.push(...projectorBuilders.map(f => f.build()));
+    } else {
+      result.push(builder.build());
+    }
+  });
+
+  return result;
 }
