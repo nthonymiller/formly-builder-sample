@@ -20,7 +20,7 @@
               "apps/ngx-formly-test/src/favicon.ico",
               "apps/ngx-formly-test/src/assets"
             ],
-            "styles": ["apps/ngx-formly-test/src/styles.scss"],
+            "styles": ["./node_modules/@angular/material/prebuilt-themes/indigo-pink.css", "apps/ngx-formly-test/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
