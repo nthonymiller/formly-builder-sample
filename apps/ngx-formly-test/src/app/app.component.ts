@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { FormlyBuilder } from '@ngx-formly/builder';
+import { fieldType, FormlyBuilder, label } from '@ngx-formly/builder';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 
 
 export interface UserModel {
@@ -23,18 +24,17 @@ export interface Address {
 export class AppComponent {
   title = 'ngx-formly-test';
 
+  fields: FormlyFieldConfig[];
+  model = {};
+
   ngOnInit(): void {
 
     const builder = new FormlyBuilder<UserModel>();
 
-    builder.field('firstName');
-
-    builder.group('address').field('addressLine1');
-
-    builder.group('address').withFields(group => [
-      group.field('addressLine1')
-    ]);
+    builder.field('firstName').withProps(label('First name'), fieldType('input'));
+    builder.field('lastName').withProps(label('Last name'), fieldType('input'));
 
 
+    this.fields = builder.build();
   }
 }
