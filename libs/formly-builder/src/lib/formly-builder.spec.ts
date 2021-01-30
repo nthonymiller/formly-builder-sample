@@ -1,4 +1,6 @@
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldBuilder, FormlyBuilder, GroupBuilder } from './formly-builder';
+import { groupClassName, label } from './operators';
 
 export interface UserModel {
   firstName: string;
@@ -28,9 +30,20 @@ describe('Builders', () => {
     it('should build field with name', () => {
       const fieldBuilder = new FieldBuilder('name');
 
-      const config = fieldBuilder.build();
+      const config: FormlyFieldConfig = fieldBuilder.build();
 
       expect(config).toEqual({ key: 'name' });
+    });
+
+    it('should build field with props', () => {
+      const fieldBuilder = new FieldBuilder('name')
+        .withProps(
+          label('Name of Label')
+        );
+
+      const config: FormlyFieldConfig = fieldBuilder.build();
+
+      expect(config).toEqual({ key: 'name', templateOptions: { label: 'Name of Label' } });
     });
 
   });
@@ -49,7 +62,18 @@ describe('Builders', () => {
       const config = groupBuilder.build();
 
       expect(config).toEqual({ key: 'name', fieldGroup: [] });
-    })
+    });
+
+    it('should build group with props', () => {
+      const groupBuilder = new GroupBuilder('name')
+        .withProps(
+          groupClassName('flex')
+        );
+
+      const config: FormlyFieldConfig = groupBuilder.build();
+
+      expect(config).toEqual({ key: 'name', fieldGroup: [], fieldGroupClassName: 'flex' });
+    });
 
   });
 
