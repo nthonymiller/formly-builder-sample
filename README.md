@@ -1,98 +1,157 @@
 # NgxFormlyBuilder
 
-This project was generated using [Nx](https://nx.dev).
+Motivation behind creating this is too make the defining of the forms type safe, and to allow users to easily provide customizations.
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
 
-🔎 **Nx is a set of Extensible Dev Tools for Monorepos.**
+### An example model:
 
-## Quick Start & Documentation
+```typescript
 
-[Nx Documentation](https://nx.dev/angular)
+export interface UserModel {
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: Address;
+}
 
-[10-minute video showing all Nx features](https://nx.dev/angular/getting-started/what-is-nx)
+export interface Address {
+  addressLine1: string;
+  city: string;
+  zip: string;
+}
 
-[Interactive Tutorial](https://nx.dev/angular/tutorial/01-create-application)
+```
 
-## Adding capabilities to your workspace
+## Create FormlyBuilder
+Create a strongly type safe builder for the model
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+```typescript
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+const builder = new FormlyBuilder<UserModel>();
 
-Below are our core plugins:
+```
 
-- [Angular](https://angular.io)
-  - `ng add @nrwl/angular`
-- [React](https://reactjs.org)
-  - `ng add @nrwl/react`
-- Web (no framework frontends)
-  - `ng add @nrwl/web`
-- [Nest](https://nestjs.com)
-  - `ng add @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `ng add @nrwl/express`
-- [Node](https://nodejs.org)
-  - `ng add @nrwl/node`
+## Add a single field
 
-There are also many [community plugins](https://nx.dev/nx-community) you could add.
+A field is the basic building block of defining fields.
 
-## Generate an application
+This will simply create a field with the specified key. The key entered will be verified as a key in the model.
+```typescript
 
-Run `ng g @nrwl/angular:app my-app` to generate an application.
+builder.field('firstName');
 
-> You can use any of the plugins above to generate applications as well.
+```
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+Define additional properties using withProps(...)
 
-## Generate a library
+```typescript
 
-Run `ng g @nrwl/angular:lib my-lib` to generate a library.
+builder.field('firstName').withProps(label('First name'), fieldType('input'));
 
-> You can also use any of the plugins above to generate libraries as well.
+```
+withProps(...) takes an array of operators that are used to build up the formly field definitions.
 
-Libraries are sharable across libraries and applications. They can be imported from `@ngx-formly-builder/mylib`.
 
-## Development server
+## Add multiple fields
 
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+The ability to add multiple fields.
 
-## Code scaffolding
+```typescript
 
-Run `ng g component my-component --project=my-app` to generate a new component.
+builder.withFields(builder => [
+  builder.field('firstName').withProps(label('First name'), fieldType('input')),
+  builder.field('lastName').withProps(label('Last name'), fieldType('input'))
+]);
 
-## Build
+```
 
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Add Complex Object
 
-## Running unit tests
+The ability to specify a nested object with fields.
 
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+```typescript
 
-Run `nx affected:test` to execute the unit tests affected by a change.
+builder.group('address')
+  .withFields(group => [
+    group.field('addressLine1').withProps(label('Address Line 1'), fieldType('input')),
+    group.field('city').withProps(label('City'), fieldType('input')),
+    group.field('zip').withProps(label('Zip'), fieldType('input')),
+  ]);
 
-## Running end-to-end tests
+```
 
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+## Add Layout
 
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
+The ability to group fields together for the purpose of defining a layout.
 
-## Understand your workspace
+```typescript
 
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
+builder.layout()
+  .withProps(groupClassName('grid grid-cols-2 gap-x-6'))
+  .withFields(group => [
+    group.field('firstName').withProps(label('First name'), fieldType('input')),
+    group.field('lastName').withProps(label('Last name'), fieldType('input'))
+  ]);
 
-## Further help
+```
 
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
+## Build the form
 
-## ☁ Nx Cloud
+The output from the build method generates the `FormlyFieldConfig`
 
-### Computation Memoization in the Cloud
+```typescript
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
+const fields = builder.build();
 
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
+```
 
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
 
-Visit [Nx Cloud](https://nx.app/) to learn more.
+## Operators
+
+The operators provide this ability to FormlyFieldConfig during the form build process. Operators are composed together for the desired outcome
+
+- label
+- fieldType
+- inputType
+- min
+- max
+- minLength
+- required
+- defaultValue
+- className
+- groupClassName
+- focusField
+- hiddenField
+- customProps
+- expressionProps
+- hideExpression
+- fieldHooks ( onInitField, afterViewInitField, onDestroyField )
+- validators
+
+### Custom Operator chaining
+
+Provide the ability to compose your own operators together to reduce bloat.
+
+```typescript
+
+export const emailField = () => pipe(
+    fieldType('input'),
+    inputType('email'),
+    validators({ validation: ['email'] })
+  );
+
+
+builder.field('email').withProps(emailField())
+
+```
+
+Or pass in custom parameters to enforce setting of values:
+
+```typescript
+
+export const numberField = (decimalPlaces: number) => pipe(
+    fieldType('number'),
+    customProps({ decimalPlaces: decimalPlaces })
+  );
+
+```
