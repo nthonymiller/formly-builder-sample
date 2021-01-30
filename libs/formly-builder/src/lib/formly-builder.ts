@@ -34,7 +34,7 @@ export class FieldBuilder<T> implements Builder<FormlyFieldConfig> {
 }
 
 
-export abstract class GroupBuildBase<T extends Obj = any> {
+export abstract class GroupBuildBase<T extends Obj> {
 
   protected _builders: Array<any> = [];
 
@@ -42,7 +42,7 @@ export abstract class GroupBuildBase<T extends Obj = any> {
     return this.addBuilder(new FieldBuilder(key));
   }
 
-  public withFields<R extends Builder<any>, K = this>(project: (value: K) => R[]): GroupBuildBase {
+  public withFields<R extends Builder<any>, K = this>(project: (value: K) => R[]): GroupBuildBase<T> {
     this.addBuilder(project);
     return this;
   }
@@ -51,16 +51,35 @@ export abstract class GroupBuildBase<T extends Obj = any> {
     return this.addBuilder(new GroupBuilder<T[K]>(key));
   }
 
+  public layout(): LayoutBuilder<T> {
+    return this.addBuilder(new LayoutBuilder<T>());
+  }
+
+  abstract build(): any;
+
   protected addBuilder<U>(value: U): U {
     this._builders.push(value);
     return value;
   }
 
-  abstract build(): any;
+  protected buildGroup<T>(current: Builder<T>, builders: Array<any>): FormlyFieldConfig[] {
+    const result = [];
+
+    builders.forEach(builder => {
+      if (builder instanceof Function) {
+        const projectorBuilders = builder(current) as Array<Builder<any>>;
+        result.push(...projectorBuilders.map(f => f.build()));
+      } else {
+        result.push(builder.build());
+      }
+    });
+
+    return result;
+  }
 
 }
 
-export class GroupBuilder<T extends Obj = any> extends GroupBuildBase<T> implements Builder<FormlyFieldConfig> {
+export class GroupBuilder<T extends Obj> extends GroupBuildBase<T> implements Builder<FormlyFieldConfig> {
 
   private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
 
@@ -74,7 +93,7 @@ export class GroupBuilder<T extends Obj = any> extends GroupBuildBase<T> impleme
       props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
     }
 
-    const fieldGroup = buildGroup(this, this._builders);
+    const fieldGroup = this.buildGroup(this, this._builders);
 
     const result: FormlyFieldConfig = {
       ...props,
@@ -90,25 +109,38 @@ export class GroupBuilder<T extends Obj = any> extends GroupBuildBase<T> impleme
   }
 }
 
-export class FormlyBuilder<T extends Obj = any> extends GroupBuildBase<T> implements Builder<FormlyFieldConfig[]> {
 
-  public build(): FormlyFieldConfig[] {
-    return buildGroup(this, this._builders);
+export class LayoutBuilder<T> extends GroupBuildBase<T> {
+
+  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
+
+  public build(): FormlyFieldConfig {
+    let props = {};
+    if (this.operations?.length > 0) {
+      props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
+    }
+
+    const fieldGroup = this.buildGroup(this, this._builders);
+
+    const result: FormlyFieldConfig = {
+      ...props,
+      fieldGroup
+    };
+    return result;
+  }
+
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): LayoutBuilder<T> {
+    this.operations = operations;
+    return this;
   }
 
 }
 
-export function buildGroup<T>(current: Builder<T>, builders: Array<any>): FormlyFieldConfig[] {
-  const result = [];
 
-  builders.forEach(builder => {
-    if (builder instanceof Function) {
-      const projectorBuilders = builder(current) as Array<Builder<any>>;
-      result.push(...projectorBuilders.map(f => f.build()));
-    } else {
-      result.push(builder.build());
-    }
-  });
+export class FormlyBuilder<T extends Obj = any> extends GroupBuildBase<T> implements Builder<FormlyFieldConfig[]> {
 
-  return result;
+  public build(): FormlyFieldConfig[] {
+    return this.buildGroup(this, this._builders);
+  }
+
 }
