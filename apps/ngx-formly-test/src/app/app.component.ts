@@ -7,7 +7,8 @@ export interface UserModel {
   firstName: string;
   lastName: string;
   email: string;
-  address: Address;
+  postalAddress: Address;
+  homeAddress: Address;
 }
 
 export interface Address {
@@ -29,8 +30,18 @@ export class AppComponent {
 
   ngOnInit(): void {
 
+    const templateBody = (title: string) => `<div class="text-lg font-semibold my-3">${title}</div>`;
+
+    const addressBuilder = new FormlyBuilder<Address>();
+    addressBuilder.withFields(group => [
+      group.field('addressLine1').withProps(label('Address Line 1'), fieldType('input')),
+      group.field('city').withProps(label('City'), fieldType('input')),
+      group.field('zip').withProps(label('Zip'), fieldType('input')),
+    ]);
+
     const builder = new FormlyBuilder<UserModel>();
 
+    builder.template(templateBody('Customer Details'))
     builder.layout()
       .withProps(groupClassName('grid grid-cols-2 gap-x-6'))
       .withFields(group => [
@@ -38,7 +49,12 @@ export class AppComponent {
         group.field('lastName').withProps(label('Last name'), fieldType('input'))
       ]);
 
-    builder.group('address')
+    // Can add another builder for reuse
+    builder.group('homeAddress').add(addressBuilder);
+
+    // Or specify the fields this way
+
+    builder.group('postalAddress')
       .withFields(group => [
         group.field('addressLine1').withProps(label('Address Line 1'), fieldType('input')),
         group.field('city').withProps(label('City'), fieldType('input')),
