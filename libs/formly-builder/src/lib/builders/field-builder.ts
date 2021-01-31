@@ -22,7 +22,7 @@ export class FieldBuilder<T> implements Builder<FormlyFieldConfig> {
     return result;
   }
 
-  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): FieldBuilder<T> {
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
     this.operations = operations;
     return this;
   }

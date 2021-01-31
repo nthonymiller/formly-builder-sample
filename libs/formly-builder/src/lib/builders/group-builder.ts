@@ -90,7 +90,7 @@ export class GroupBuilder<T extends Obj> extends GroupBuildBase<T> implements Bu
     return result;
   }
 
-  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): GroupBuilder<T> {
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
     this.operations = operations;
     return this;
   }
@@ -115,7 +115,7 @@ export class LayoutBuilder<T> extends GroupBuildBase<T> {
     return result;
   }
 
-  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): LayoutBuilder<T> {
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
     this.operations = operations;
     return this;
   }
