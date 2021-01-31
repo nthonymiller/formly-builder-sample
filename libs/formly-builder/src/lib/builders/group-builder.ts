@@ -6,10 +6,10 @@ import { FieldBuilder } from './field-builder';
 import { TemplateBuilder } from './template-builder';
 
 
-export type ProjectorFn<R extends Builder<any>, K extends GroupBuildBase<any>> = (value: K) => R[];
+export type ProjectorFn<R extends Builder<any>, K extends GroupBuilderBase<any>> = (value: K) => R[];
 
-
-export abstract class GroupBuildBase<T extends Obj> {
+/** GroupBuilderBase is an abstract base class add common functionality used by GroupBuilder, LayoutBuilder and FormlyBuilder */
+export abstract class GroupBuilderBase<T extends Obj> {
 
   protected _builders: Array<any> = [];
 
@@ -19,7 +19,7 @@ export abstract class GroupBuildBase<T extends Obj> {
     return result;
   }
 
-  public withFields<R extends Builder<any>, K extends GroupBuildBase<T>>(project: ProjectorFn<R, K>): this {
+  public withFields<R extends Builder<any>, K extends GroupBuilderBase<T>>(project: ProjectorFn<R, K>): this {
     this.add(project);
     return this;
   }
@@ -44,7 +44,7 @@ export abstract class GroupBuildBase<T extends Obj> {
 
   abstract build(): any;
 
-  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | ProjectorFn<Builder<any>, GroupBuildBase<any>>>(value: U): this {
+  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | ProjectorFn<Builder<any>, GroupBuilderBase<any>>>(value: U): this {
     this._builders.push(value);
     return this;
   }
@@ -66,7 +66,8 @@ export abstract class GroupBuildBase<T extends Obj> {
   }
 }
 
-export class GroupBuilder<T extends Obj> extends GroupBuildBase<T> implements Builder<FormlyFieldConfig> {
+/** GroupBuilder handles complex object node in the tree */
+export class GroupBuilder<T extends Obj> extends GroupBuilderBase<T> implements Builder<FormlyFieldConfig> {
 
   private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
 
@@ -96,7 +97,9 @@ export class GroupBuilder<T extends Obj> extends GroupBuildBase<T> implements Bu
   }
 }
 
-export class LayoutBuilder<T> extends GroupBuildBase<T> {
+/** LayoutBuilder handles layouts, by grouping nodes in the tree. This builder has no key as such
+ * does not add anything to the model structure */
+export class LayoutBuilder<T> extends GroupBuilderBase<T> {
 
   private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
 

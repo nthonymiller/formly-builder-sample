@@ -95,6 +95,19 @@ builder.layout()
 
 ```
 
+## Add Custom Template
+
+The ability to inject custom html template into the layout.
+
+```typescript
+
+builder.template('<div class="text-lg font-semibold my-3">Some heading</div>');
+
+
+```
+
+
+
 ## Build the form
 
 The output from the build method generates the `FormlyFieldConfig`

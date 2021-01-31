@@ -3,6 +3,8 @@ import { pipeFromArray } from '../pipe';
 import { MonoTypeOperatorFunction } from '../types';
 import { Builder } from './builder';
 
+
+/** FieldBuilder defines a field in the node tree with the specified key */
 export class FieldBuilder<T> implements Builder<FormlyFieldConfig> {
 
   private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
