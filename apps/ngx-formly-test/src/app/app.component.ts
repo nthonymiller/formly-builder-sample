@@ -50,10 +50,11 @@ export class AppComponent {
       ]);
 
     // Can add another builder for reuse
+    builder.template(templateBody('Home Address'));
     builder.group('homeAddress').add(addressBuilder);
 
     // Or specify the fields this way
-
+    builder.template(templateBody('Postal Address'));
     builder.group('postalAddress')
       .withFields(group => [
         group.field('addressLine1').withProps(label('Address Line 1'), fieldType('input')),
