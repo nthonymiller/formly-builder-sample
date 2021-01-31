@@ -13,32 +13,40 @@ export abstract class GroupBuildBase<T extends Obj> {
 
   protected _builders: Array<any> = [];
 
-  public field<K extends keyof T>(key: K): FieldBuilder<any> {
-    return this.add(new FieldBuilder(key));
+  public field<K extends keyof T>(key: K): FieldBuilder<K> {
+    const result = new FieldBuilder<K>(key);
+    this.add(result)
+    return result;
   }
 
-  public withFields<R extends Builder<any>, K extends GroupBuildBase<T>>(project: ProjectorFn<R, K>): GroupBuildBase<T> {
+  public withFields<R extends Builder<any>, K extends GroupBuildBase<T>>(project: ProjectorFn<R, K>): this {
     this.add(project);
     return this;
   }
 
   public group<K extends keyof T>(key: K): GroupBuilder<T[K]> {
-    return this.add(new GroupBuilder<T[K]>(key));
+    const result = new GroupBuilder<T[K]>(key);
+    this.add(result);
+    return result;
   }
 
   public layout(): LayoutBuilder<T> {
-    return this.add(new LayoutBuilder<T>());
+    const result = new LayoutBuilder<T>();
+    this.add(result)
+    return result;
   }
 
   public template(template: string): TemplateBuilder {
-    return this.add(new TemplateBuilder(template));
+    const result = new TemplateBuilder(template);
+    this.add(result);
+    return result;
   }
 
   abstract build(): any;
 
-  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | ProjectorFn<Builder<any>, GroupBuildBase<any>>>(value: U): U {
+  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | ProjectorFn<Builder<any>, GroupBuildBase<any>>>(value: U): this {
     this._builders.push(value);
-    return value;
+    return this;
   }
 
   protected buildGroup<T>(current: Builder<T>, builders: Array<any>): FormlyFieldConfig[] {
