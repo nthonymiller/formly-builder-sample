@@ -49,12 +49,12 @@ export abstract class GroupBuildBase<T extends Obj> {
     return this;
   }
 
-  protected buildGroup<T>(current: Builder<T>, builders: Array<any>): FormlyFieldConfig[] {
+  protected buildGroup<T>(): FormlyFieldConfig[] {
     const result = [];
 
-    builders.forEach(builder => {
+    this._builders.forEach(builder => {
       if (builder instanceof Function) {
-        const projectorBuilders = builder(current) as Array<Builder<any>>;
+        const projectorBuilders = builder(this) as Array<Builder<any>>;
         result.push(...projectorBuilders.map(f => f.build()));
       } else {
         const config = builder.build();
@@ -80,7 +80,7 @@ export class GroupBuilder<T extends Obj> extends GroupBuildBase<T> implements Bu
       props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
     }
 
-    const fieldGroup = this.buildGroup(this, this._builders);
+    const fieldGroup = this.buildGroup();
 
     const result: FormlyFieldConfig = {
       ...props,
@@ -106,7 +106,7 @@ export class LayoutBuilder<T> extends GroupBuildBase<T> {
       props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
     }
 
-    const fieldGroup = this.buildGroup(this, this._builders);
+    const fieldGroup = this.buildGroup();
 
     const result: FormlyFieldConfig = {
       ...props,

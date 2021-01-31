@@ -32,6 +32,9 @@ export class AppComponent {
 
     const templateBody = (title: string) => `<div class="text-lg font-semibold my-3">${title}</div>`;
 
+    const emptyTypeBuilder = new FormlyBuilder();
+    emptyTypeBuilder.field('John');
+
     const addressBuilder = new FormlyBuilder<Address>();
     addressBuilder.withFields(group => [
       group.field('addressLine1').withProps(label('Address Line 1'), fieldType('input')),
