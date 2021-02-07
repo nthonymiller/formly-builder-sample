@@ -145,6 +145,7 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
     return this;
   }
 
+  // Can this be done with an array??
   public layout(): LayoutBuilder<T> {
     const result = new LayoutBuilder<T>();
     this.add(result)
@@ -212,7 +213,7 @@ export class ArrayBuilder<T extends Obj> implements Builder<FormlyFieldConfig> {
       props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
     }
 
-    let fieldArray: FormlyFieldConfig;
+    let fieldArray: FormlyFieldConfig = {};
 
     if (this._builder instanceof ArrayGroupBuilder) {
       const fieldGroup = this._builder.build()

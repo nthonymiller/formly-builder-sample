@@ -1,6 +1,6 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { groupClassName } from '../operators';
-import { GroupBuilder, LayoutBuilder } from './group-builder';
+import { GroupBuilder } from './group-builder';
 
 describe('GroupBuilder', () => {
 
@@ -32,21 +32,3 @@ describe('GroupBuilder', () => {
 
 });
 
-describe('LayoutBuilder', () => {
-
-  it('should create layout', () => {
-    const layoutBuilder = new LayoutBuilder();
-
-    expect(layoutBuilder).toBeDefined();
-  })
-
-  it('should build layout with props', () => {
-    const layoutBuilder = new LayoutBuilder();
-    layoutBuilder.withProps(groupClassName('flex'));
-
-    const config: FormlyFieldConfig = layoutBuilder.build();
-
-    expect(config).toEqual({ fieldGroup: [], fieldGroupClassName: 'flex' });
-  })
-
-})
