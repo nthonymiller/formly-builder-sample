@@ -69,8 +69,7 @@ export class AppComponent {
         group.field('zip').withProps(label('Zip'), fieldType('input')),
       ]);
 
-    builder.array('phones');
-
+    builder.array('phones').group().withFields(group => [group.field('phoneNo').withProps(label('Phone no'), fieldType('input'))])
 
     this.fields = builder.build();
   }
