@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { fieldType, FormlyBuilder, groupClassName, label } from '@ngx-formly/builder';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
+export interface Phone {
+  phoneNo: string;
+}
 
 export interface UserModel {
   firstName: string;
@@ -9,6 +12,7 @@ export interface UserModel {
   email: string;
   postalAddress: Address;
   homeAddress: Address;
+  phones: Array<Phone>;
 }
 
 export interface Address {
@@ -64,6 +68,9 @@ export class AppComponent {
         group.field('city').withProps(label('City'), fieldType('input')),
         group.field('zip').withProps(label('Zip'), fieldType('input')),
       ]);
+
+    builder.array('phones');
+
 
     this.fields = builder.build();
   }

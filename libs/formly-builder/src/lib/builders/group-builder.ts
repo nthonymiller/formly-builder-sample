@@ -1,6 +1,7 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { pipeFromArray } from '../pipe';
-import { MonoTypeOperatorFunction, Obj } from '../types';
+import { ArrayProperties, ArrayPropertyType, MonoTypeOperatorFunction, Obj } from '../types';
+import { ArrayBuilder } from './array-builder';
 import { Builder } from './builder';
 import { FieldBuilder } from './field-builder';
 import { TemplateBuilder } from './template-builder';
@@ -38,6 +39,12 @@ export abstract class GroupBuilderBase<T extends Obj> {
 
   public template(template: string): TemplateBuilder {
     const result = new TemplateBuilder(template);
+    this.add(result);
+    return result;
+  }
+
+  public array<K extends keyof ArrayProperties<T>>(key: K): ArrayBuilder<ArrayPropertyType<T[K]>> {
+    const result = new ArrayBuilder<ArrayPropertyType<T[K]>>(key);
     this.add(result);
     return result;
   }
