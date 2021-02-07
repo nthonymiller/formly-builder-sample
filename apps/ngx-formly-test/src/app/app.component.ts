@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { fieldType, FormlyBuilder, groupClassName, label } from '@ngx-formly/builder';
+import { afterViewInitField, defaultValue, fieldType, FormlyBuilder, groupClassName, inputType, label, onInitField } from '@ngx-formly/builder';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { debounceTime, filter, startWith, tap } from 'rxjs/operators';
 
 export interface Phone {
   phoneNo: string;
@@ -13,6 +14,8 @@ export interface UserModel {
   postalAddress: Address;
   homeAddress: Address;
   phones: Array<Phone>;
+  tags: Array<string>;
+  tagCount: number;
 }
 
 export interface Address {
@@ -30,7 +33,10 @@ export class AppComponent {
   title = 'ngx-formly-test';
 
   fields: FormlyFieldConfig[];
-  model = {};
+  model: Partial<UserModel> = {
+    tagCount: 3,
+    tags: []
+  };
 
   ngOnInit(): void {
 
@@ -69,7 +75,33 @@ export class AppComponent {
         group.field('zip').withProps(label('Zip'), fieldType('input')),
       ]);
 
-    builder.array('phones').group().withFields(group => [group.field('phoneNo').withProps(label('Phone no'), fieldType('input'))])
+
+
+    builder.field('tagCount').withProps(
+      label('Tag count'),
+      fieldType('input'),
+      inputType('number'),
+      onInitField(field => {
+        return field.formControl.valueChanges
+          .pipe(
+            startWith(field.formControl.value),
+            filter(v => v > 0),
+            debounceTime(100), // need to delay here due to on change detection error
+            tap(value => {
+              this.model.tags.length = value;
+              this.model = {
+                ...this.model,
+                tagCount: value,
+              };
+            }),
+        );
+      })
+    );
+    builder.array('tags')
+      .withProps(fieldType('simple-repeat'))
+      .field('tag').withProps(label('Tag'), fieldType('input'));
+
+    //builder.array('phones').group().withFields(group => [group.field('phoneNo').withProps(label('Phone no'), fieldType('input'))])
 
     this.fields = builder.build();
   }

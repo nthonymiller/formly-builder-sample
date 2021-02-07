@@ -1,12 +1,12 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { pipeFromArray } from '../pipe';
-import { ArrayProperties, ArrayPropertyType, MonoTypeOperatorFunction, Obj } from '../types';
+import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject, TypeMap } from '../types';
 import { Builder } from './builder';
 import { FieldBuilder } from './field-builder';
 import { TemplateBuilder } from './template-builder';
 
 
-export type ProjectorFn<R extends Builder<any>, K extends GroupBuilderBase<any>> = (value: K) => R[];
+export type BuildProjectorFn<R extends Builder<any>, K> = (value: K) => R[];
 
 /** GroupBuilderBase is an abstract base class add common functionality used by GroupBuilder, LayoutBuilder and FormlyBuilder */
 export abstract class GroupBuilderBase<T extends Obj> {
@@ -19,7 +19,7 @@ export abstract class GroupBuilderBase<T extends Obj> {
     return result;
   }
 
-  public withFields<R extends Builder<any>, K extends GroupBuilderBase<T>>(project: ProjectorFn<R, K>): this {
+  public withFields<R extends Builder<any>, K extends GroupBuilderBase<T>>(project: BuildProjectorFn<R, K>): this {
     this.add(project);
     return this;
   }
@@ -50,7 +50,7 @@ export abstract class GroupBuilderBase<T extends Obj> {
 
   abstract build(): any;
 
-  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | ProjectorFn<Builder<any>, GroupBuilderBase<any>>>(value: U): this {
+  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | BuildProjectorFn<Builder<any>, GroupBuilderBase<any>>>(value: U): this {
     this._builders.push(value);
     return this;
   }
@@ -140,7 +140,7 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
     return result;
   }
 
-  public withFields<R extends Builder<any>, K extends GroupBuilderBase<T>>(project: ProjectorFn<R, K>): this {
+  public withFields<R extends Builder<any>, K extends ArrayGroupBuilder<T>>(project: BuildProjectorFn<R, K>): this {
     this.add(project);
     return this;
   }
@@ -158,7 +158,7 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
     return result;
   }
 
-  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | ProjectorFn<Builder<any>, GroupBuilderBase<any>>>(value: U): this {
+  public add<U extends Builder<FormlyFieldConfig | FormlyFieldConfig[]> | BuildProjectorFn<Builder<any>, ArrayGroupBuilder<any>>>(value: U): this {
     this._builders.push(value);
     return this;
   }
@@ -180,21 +180,22 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
   }
 }
 
-export class ArrayBuilder<T extends Obj> implements Builder<FormlyFieldConfig> {
+export class ArrayBuilder<T extends PrimitiveOrObject> implements Builder<FormlyFieldConfig> {
 
   protected _builder: Builder<any>;
   private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
 
   constructor(public key: string | number | any) { }
 
-  public field<K extends keyof T>(key: K): FieldBuilder<K> {
-    const result = new FieldBuilder<K>(key);
+  // How to restrict this if T is Obj ?? What about dates ??
+  public field<U extends PrimitiveType<T>>(key: string | number | any): FieldBuilder<U> {
+    const result = new FieldBuilder<U>(key);
     this.add(result)
     return result;
   }
 
-  public group(): ArrayGroupBuilder<T> {
-    const result = new ArrayGroupBuilder<T>();
+  public group<U extends ObjectType<T>>(): ArrayGroupBuilder<U> {
+    const result = new ArrayGroupBuilder<U>();
     this.add(result);
     return result;
   }
