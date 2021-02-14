@@ -12,6 +12,7 @@ export * from './expression-props';
 export * from './hide-expression';
 export * from './field-hooks';
 export * from './required';
+export * from './readonly-field';
 export * from './min-length';
 export * from './focus-field';
 export * from './hidden-field';

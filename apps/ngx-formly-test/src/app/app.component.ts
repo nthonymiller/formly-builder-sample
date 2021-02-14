@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { afterViewInitField, defaultValue, fieldType, FormlyBuilder, groupClassName, inputType, label, onInitField } from '@ngx-formly/builder';
+import { fieldType, FormlyBuilder, groupClassName, inputType, label, onInitField } from '@ngx-formly/builder';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { debounceTime, filter, startWith, tap } from 'rxjs/operators';
 
@@ -39,7 +39,6 @@ export class AppComponent {
   };
 
   ngOnInit(): void {
-
     const templateBody = (title: string) => `<div class="text-lg font-semibold my-3">${title}</div>`;
 
     const emptyTypeBuilder = new FormlyBuilder();
@@ -74,8 +73,6 @@ export class AppComponent {
         group.field('city').withProps(label('City'), fieldType('input')),
         group.field('zip').withProps(label('Zip'), fieldType('input')),
       ]);
-
-
 
     builder.field('tagCount').withProps(
       label('Tag count'),

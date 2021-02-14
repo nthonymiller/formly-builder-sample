@@ -1,10 +1,13 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
-export function className(className: string) {
+export function readonlyField(value: boolean = true) {
   return (configuration: FormlyFieldConfig): FormlyFieldConfig => {
     return {
       ...configuration,
-      className: `${configuration.className ?? ''} ${className ?? ''}`
+      templateOptions: {
+        ...(configuration.templateOptions ?? {}),
+        readonly: value
+      }
     };
   }
 }

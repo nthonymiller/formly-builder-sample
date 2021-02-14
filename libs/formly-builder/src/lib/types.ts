@@ -15,6 +15,10 @@ export type ArrayProperties<T> = Pick<T,
 
 export type ArrayPropertyType<T> = T extends Array<infer U> ? U : never;
 
+type Unboxed<T> =
+    T extends (infer U)[]
+        ? U
+        : T;
 
 export interface TypeMap { // for mapping from strings to types
   string: string;

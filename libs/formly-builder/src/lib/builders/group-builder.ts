@@ -1,6 +1,6 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { pipeFromArray } from '../pipe';
-import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject, TypeMap } from '../types';
+import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject } from '../types';
 import { Builder } from './builder';
 import { FieldBuilder } from './field-builder';
 import { TemplateBuilder } from './template-builder';
@@ -130,9 +130,10 @@ export class LayoutBuilder<T> extends GroupBuilderBase<T> {
   }
 }
 
-export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConfig[]> {
+export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConfig> {
 
   protected _builders: Array<any> = [];
+  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
 
   public field<K extends keyof T>(key: K): FieldBuilder<K> {
     const result = new FieldBuilder<K>(key);
@@ -142,6 +143,11 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
 
   public withFields<R extends Builder<any>, K extends ArrayGroupBuilder<T>>(project: BuildProjectorFn<R, K>): this {
     this.add(project);
+    return this;
+  }
+
+  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
+    this.operations = operations;
     return this;
   }
 
@@ -163,19 +169,27 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
     return this;
   }
 
-  public build(): FormlyFieldConfig[] {
-    const result = [];
+  public build(): FormlyFieldConfig {
+    let props = {};
+    if (this.operations?.length > 0) {
+      props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
+    }
 
+    const fieldGroup: FormlyFieldConfig[] = [];
     this._builders.forEach(builder => {
       if (builder instanceof Function) {
         const projectorBuilders = builder(this) as Array<Builder<any>>;
-        result.push(...projectorBuilders.map(f => f.build()));
+        fieldGroup.push(...projectorBuilders.map(f => f.build()));
       } else {
         const config = builder.build();
-        Array.isArray(config) ? result.push(...config) : result.push(config);
+        Array.isArray(config) ? fieldGroup.push(...config) : fieldGroup.push(config);
       }
     });
 
+    const result: FormlyFieldConfig = {
+      ...props,
+      fieldGroup
+    };
     return result;
   }
 }
@@ -214,14 +228,7 @@ export class ArrayBuilder<T extends PrimitiveOrObject> implements Builder<Formly
       props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
     }
 
-    let fieldArray: FormlyFieldConfig = {};
-
-    if (this._builder instanceof ArrayGroupBuilder) {
-      const fieldGroup = this._builder.build()
-      fieldArray = { fieldGroup };
-    } else if (this._builder instanceof FieldBuilder) {
-      fieldArray = this._builder.build();
-    }
+    let fieldArray: FormlyFieldConfig = this._builder.build();
 
     const result: FormlyFieldConfig = {
       ...props,
