@@ -1,8 +1,10 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { FormlyHookFn, FormlyLifeCycleOptions } from '@ngx-formly/core/lib/components/formly.field.config';
+import { PropType } from '../types';
 
-export function fieldHooks(value: FormlyLifeCycleOptions<FormlyHookFn>) {
-  return (configuration: FormlyFieldConfig): FormlyFieldConfig => {
+type hookType =  PropType<FormlyFieldConfig, 'hooks'>;
+
+export function fieldHooks<U = hookType>(value: U) {
+  return <T extends Pick<FormlyFieldConfig, 'hooks'>>(configuration: T): T => {
     return {
       ...configuration,
       hooks: {
@@ -13,6 +15,6 @@ export function fieldHooks(value: FormlyLifeCycleOptions<FormlyHookFn>) {
   }
 }
 
-export const onInitField = (formlyHookFn: FormlyHookFn) => fieldHooks({ onInit: formlyHookFn });
-export const afterViewInitField = (formlyHookFn: FormlyHookFn) => fieldHooks({ afterViewInit: formlyHookFn });
-export const onDestroyField = (formlyHookFn: FormlyHookFn) => fieldHooks({ onDestroy: formlyHookFn });
+export const onInitField = <U = hookType>(formlyHookFn: U) => fieldHooks({ onInit: formlyHookFn });
+export const afterViewInitField = <U = hookType>(formlyHookFn: U) => fieldHooks({ afterViewInit: formlyHookFn });
+export const onDestroyField = <U = hookType>(formlyHookFn: U) => fieldHooks({ onDestroy: formlyHookFn });

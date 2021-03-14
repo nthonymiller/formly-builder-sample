@@ -1,7 +1,7 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
-export function defaultValue<T>(value: T) {
-  return (configuration: FormlyFieldConfig): FormlyFieldConfig => {
+export function defaultValue<TValue>(value: TValue) {
+  return <T extends Pick<FormlyFieldConfig, 'defaultValue'>>(configuration: T): T => {
     return {
       ...configuration,
       defaultValue: value

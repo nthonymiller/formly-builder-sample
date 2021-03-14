@@ -1,7 +1,11 @@
 import { Component } from '@angular/core';
-import { fieldType, FormlyBuilder, groupClassName, label } from '@ngx-formly/builder';
+import { fieldType, FormlyBuilder, groupClassName, inputType, label, onInitField } from '@ngx-formly/builder';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { debounceTime, filter, startWith, tap } from 'rxjs/operators';
 
+export interface Phone {
+  phoneNo: string;
+}
 
 export interface UserModel {
   firstName: string;
@@ -9,6 +13,9 @@ export interface UserModel {
   email: string;
   postalAddress: Address;
   homeAddress: Address;
+  phones: Array<Phone>;
+  tags: Array<string>;
+  tagCount: number;
 }
 
 export interface Address {
@@ -26,10 +33,12 @@ export class AppComponent {
   title = 'ngx-formly-test';
 
   fields: FormlyFieldConfig[];
-  model = {};
+  model: Partial<UserModel> = {
+    tagCount: 3,
+    tags: []
+  };
 
   ngOnInit(): void {
-
     const templateBody = (title: string) => `<div class="text-lg font-semibold my-3">${title}</div>`;
 
     const emptyTypeBuilder = new FormlyBuilder();
@@ -64,6 +73,34 @@ export class AppComponent {
         group.field('city').withProps(label('City'), fieldType('input')),
         group.field('zip').withProps(label('Zip'), fieldType('input')),
       ]);
+
+    builder.field('tagCount').withProps(
+      label('Tag count'),
+      fieldType('input'),
+      inputType('number'),
+      onInitField(field => {
+        return field.formControl.valueChanges
+          .pipe(
+            startWith(field.formControl.value),
+            filter(v => v > 0),
+            debounceTime(100), // need to delay here due to on change detection error
+            tap((value: number) => {
+              this.model = {
+                ...this.model,
+                tags: (this.model.tags ?? []),
+                tagCount: value,
+              };
+              this.model.tags.length = value;
+            }),
+        );
+      })
+    );
+    builder.array('tags')
+      .withProps(fieldType('simple-repeat'))
+        .field('tag')
+        .withProps(label('Tag'), fieldType('input'));
+
+    //builder.array('phones').group().withFields(group => [group.field('phoneNo').withProps(label('Phone no'), fieldType('input'))])
 
     this.fields = builder.build();
   }
