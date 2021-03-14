@@ -1,3 +1,5 @@
+import { FormlyFieldConfig } from '@ngx-formly/core';
+
 export interface UnaryFunction<T, R> { (source: T): R; }
 
 export interface OperatorFunction<T, R> extends UnaryFunction<T, R> {}
@@ -35,3 +37,12 @@ export type GuardedType<T extends PrimitiveOrObject> = T extends Obj ? T : T ext
 export type ObjectType<T> = T extends Obj ? T : never;
 
 export type PrimitiveType<T> = T extends Obj ? never : T ;
+
+export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp];
+
+export type FormlyGroupProps = Pick<FormlyFieldConfig, 'id' | 'fieldGroupClassName' | 'fieldGroup' | 'modelOptions' | 'hideExpression'>;
+export type FormlyArrayProps = Pick<FormlyFieldConfig, 'id' | 'type' | 'fieldArray' | 'modelOptions' | 'templateOptions'>;
+export type FormlyTemplateProps = Pick<FormlyFieldConfig, 'id' | 'template'>;
+export type FormlyLayoutProps = Pick<FormlyFieldConfig, 'fieldGroupClassName' | 'hideExpression'>;
+export type FormlyFieldProps = Omit<FormlyFieldConfig, 'fieldGroupClassName' | 'fieldGroup' | 'fieldArray' | 'template'>;
+export type FieldTemplateOptions = Pick<FormlyFieldConfig, 'templateOptions'>;

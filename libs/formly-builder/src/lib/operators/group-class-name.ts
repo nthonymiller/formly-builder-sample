@@ -1,10 +1,10 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
 export function groupClassName(className: string) {
-  return (configuration: FormlyFieldConfig): FormlyFieldConfig => {
+  return <T extends Pick<FormlyFieldConfig, 'fieldGroupClassName'>>(configuration: T): T => {
     return {
       ...configuration,
-      fieldGroupClassName: className
+      fieldGroupClassName: className,
     };
   }
 }

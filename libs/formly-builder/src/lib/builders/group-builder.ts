@@ -1,6 +1,6 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { pipeFromArray } from '../pipe';
-import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject } from '../types';
+import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject, FormlyGroupProps, FormlyLayoutProps } from '../types';
 import { Builder } from './builder';
 import { FieldBuilder } from './field-builder';
 import { TemplateBuilder } from './template-builder';
@@ -75,7 +75,7 @@ export abstract class GroupBuilderBase<T extends Obj> {
 /** GroupBuilder handles complex object node in the tree */
 export class GroupBuilder<T extends Obj> extends GroupBuilderBase<T> implements Builder<FormlyFieldConfig> {
 
-  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
+  private operations: MonoTypeOperatorFunction<FormlyGroupProps>[];
 
   constructor(public key: string | number | any) {
     super()
@@ -84,7 +84,7 @@ export class GroupBuilder<T extends Obj> extends GroupBuilderBase<T> implements 
   public build(): FormlyFieldConfig {
     let props = {};
     if (this.operations?.length > 0) {
-      props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
+      props = pipeFromArray<FormlyGroupProps>(this.operations)(props);
     }
 
     const fieldGroup = this.buildGroup();
@@ -97,7 +97,7 @@ export class GroupBuilder<T extends Obj> extends GroupBuilderBase<T> implements 
     return result;
   }
 
-  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
+  withProps(...operations: MonoTypeOperatorFunction<FormlyGroupProps>[]): this {
     this.operations = operations;
     return this;
   }
@@ -107,12 +107,12 @@ export class GroupBuilder<T extends Obj> extends GroupBuilderBase<T> implements 
  * does not add anything to the model structure */
 export class LayoutBuilder<T> extends GroupBuilderBase<T> {
 
-  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
+  private operations: MonoTypeOperatorFunction<FormlyLayoutProps>[];
 
   public build(): FormlyFieldConfig {
     let props = {};
     if (this.operations?.length > 0) {
-      props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
+      props = pipeFromArray<FormlyLayoutProps>(this.operations)(props);
     }
 
     const fieldGroup = this.buildGroup();
@@ -124,7 +124,7 @@ export class LayoutBuilder<T> extends GroupBuilderBase<T> {
     return result;
   }
 
-  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
+  withProps(...operations: MonoTypeOperatorFunction<FormlyLayoutProps>[]): this {
     this.operations = operations;
     return this;
   }

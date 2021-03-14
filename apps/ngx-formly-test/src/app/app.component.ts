@@ -84,19 +84,21 @@ export class AppComponent {
             startWith(field.formControl.value),
             filter(v => v > 0),
             debounceTime(100), // need to delay here due to on change detection error
-            tap(value => {
-              this.model.tags.length = value;
+            tap((value: number) => {
               this.model = {
                 ...this.model,
+                tags: (this.model.tags ?? []),
                 tagCount: value,
               };
+              this.model.tags.length = value;
             }),
         );
       })
     );
     builder.array('tags')
       .withProps(fieldType('simple-repeat'))
-      .field('tag').withProps(label('Tag'), fieldType('input'));
+        .field('tag')
+        .withProps(label('Tag'), fieldType('input'));
 
     //builder.array('phones').group().withFields(group => [group.field('phoneNo').withProps(label('Phone no'), fieldType('input'))])
 

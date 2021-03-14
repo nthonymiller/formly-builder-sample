@@ -1,7 +1,7 @@
-import { FormlyFieldConfig } from '@ngx-formly/core';
+import { FieldTemplateOptions } from '../types';
 
 export function readonlyField(value: boolean = true) {
-  return (configuration: FormlyFieldConfig): FormlyFieldConfig => {
+  return <T extends FieldTemplateOptions>(configuration: T): T => {
     return {
       ...configuration,
       templateOptions: {

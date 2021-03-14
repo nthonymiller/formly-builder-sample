@@ -1,9 +1,8 @@
-import { FormlyFieldConfig } from '@ngx-formly/core'
 import { pipeFromArray } from '../pipe';
 import { MonoTypeOperatorFunction } from '../types';
 
 export function iif(value: boolean, ...operations: MonoTypeOperatorFunction<any>[]) {
-  return (configuration: FormlyFieldConfig): FormlyFieldConfig => {
+  return <T>(configuration: T): T => {
     if (value) {
       return pipeFromArray(operations)(configuration);
     }
