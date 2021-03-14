@@ -1,8 +1,7 @@
-import { Observable } from 'rxjs';
-import { FieldTemplateOptions } from '../types';
+import { FieldTemplateOptions, MonoTypeOperatorFunction, PropType } from '../types';
 
-export function selectOptions(value: any[] | Observable<any[]>) {
-  return <T extends FieldTemplateOptions>(configuration: T): T => {
+export function selectOptions<T extends FieldTemplateOptions, U = PropType<T, 'templateOptions'>>(value: U): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       templateOptions: {
@@ -10,5 +9,5 @@ export function selectOptions(value: any[] | Observable<any[]>) {
         options: value
       }
     };
-  }
+  };
 }

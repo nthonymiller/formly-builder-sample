@@ -1,7 +1,7 @@
-import { FieldTemplateOptions } from '../types';
+import { FieldTemplateOptions, MonoTypeOperatorFunction } from '../types';
 
-export function label(value: string) {
-  return <T extends FieldTemplateOptions>(configuration: T): T => {
+export function label<T extends FieldTemplateOptions>(value: string): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       templateOptions: {
@@ -9,5 +9,5 @@ export function label(value: string) {
         label: value
       }
     };
-  }
+  };
 }

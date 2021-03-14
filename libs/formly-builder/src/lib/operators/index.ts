@@ -19,3 +19,4 @@ export * from './focus-field';
 export * from './hidden-field';
 export * from './iif';
 export * from './select-options';
+export * from './model-options';

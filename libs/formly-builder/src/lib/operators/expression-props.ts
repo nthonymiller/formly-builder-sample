@@ -1,8 +1,8 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { PropType } from '../types';
+import { MonoTypeOperatorFunction, PropType } from '../types';
 
-export function expressionProps<U = PropType<FormlyFieldConfig, 'expressionProperties'>>(value: U) {
-  return <T extends Pick<FormlyFieldConfig, 'expressionProperties'>>(configuration: T): T => {
+export function expressionProps<T extends Pick<FormlyFieldConfig, 'expressionProperties'>, U = PropType<FormlyFieldConfig, 'expressionProperties'>>(value: U): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       expressionProperties: {
@@ -10,5 +10,5 @@ export function expressionProps<U = PropType<FormlyFieldConfig, 'expressionPrope
         ...value
       }
     };
-  }
+  };
 }

@@ -1,10 +1,11 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { MonoTypeOperatorFunction } from '../types';
 
-export function groupClassName(className: string) {
-  return <T extends Pick<FormlyFieldConfig, 'fieldGroupClassName'>>(configuration: T): T => {
+export function groupClassName<T extends Pick<FormlyFieldConfig, 'fieldGroupClassName'>>(className: string): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       fieldGroupClassName: className,
     };
-  }
+  };
 }

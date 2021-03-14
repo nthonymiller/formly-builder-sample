@@ -1,10 +1,10 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { PropType } from '../types';
+import { MonoTypeOperatorFunction, PropType } from '../types';
 
 type hookType =  PropType<FormlyFieldConfig, 'hooks'>;
 
-export function fieldHooks<U = hookType>(value: U) {
-  return <T extends Pick<FormlyFieldConfig, 'hooks'>>(configuration: T): T => {
+export function fieldHooks<T extends Pick<FormlyFieldConfig, 'hooks'>, U = hookType>(value: U): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       hooks: {
@@ -12,7 +12,7 @@ export function fieldHooks<U = hookType>(value: U) {
         ...value
       }
     };
-  }
+  };
 }
 
 export const onInitField = <U = hookType>(formlyHookFn: U) => fieldHooks({ onInit: formlyHookFn });

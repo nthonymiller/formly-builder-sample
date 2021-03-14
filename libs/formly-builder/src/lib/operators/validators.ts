@@ -1,11 +1,11 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { FormlyFieldProps, PropType } from '../types';
+import { MonoTypeOperatorFunction, PropType } from '../types';
 
-export function validators<U = PropType<FormlyFieldConfig, 'validators'>>(value: U) {
-  return (configuration: FormlyFieldProps): FormlyFieldProps => {
+export function validators<T extends Pick<FormlyFieldConfig, 'validators'>, U = PropType<FormlyFieldConfig, 'validators'>>(value: U): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       validators: value
     };
-  }
+  };
 }

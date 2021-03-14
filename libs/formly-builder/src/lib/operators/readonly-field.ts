@@ -1,7 +1,7 @@
-import { FieldTemplateOptions } from '../types';
+import { FieldTemplateOptions, MonoTypeOperatorFunction } from '../types';
 
-export function readonlyField(value: boolean = true) {
-  return <T extends FieldTemplateOptions>(configuration: T): T => {
+export function readonlyField<T extends FieldTemplateOptions>(value: boolean = true): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       templateOptions: {
@@ -9,5 +9,5 @@ export function readonlyField(value: boolean = true) {
         readonly: value
       }
     };
-  }
+  };
 }

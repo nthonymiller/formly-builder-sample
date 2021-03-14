@@ -1,7 +1,7 @@
-import { FieldTemplateOptions } from '../types';
+import { FieldTemplateOptions, MonoTypeOperatorFunction } from '../types';
 
-export function customProps<T extends {}>(value: T) {
-  return <T extends FieldTemplateOptions>(configuration: T): T => {
+export function customProps<T extends FieldTemplateOptions, U extends {}>(value: U): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       templateOptions: {

@@ -1,6 +1,6 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { pipeFromArray } from '../pipe';
-import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject, FormlyGroupProps, FormlyLayoutProps } from '../types';
+import { ArrayProperties, ArrayPropertyType, ObjectType, PrimitiveType, MonoTypeOperatorFunction, Obj, PrimitiveOrObject, FormlyGroupProps, FormlyLayoutProps, FormlyArrayProps } from '../types';
 import { Builder } from './builder';
 import { FieldBuilder } from './field-builder';
 import { TemplateBuilder } from './template-builder';
@@ -197,7 +197,7 @@ export class ArrayGroupBuilder<T extends Obj> implements Builder<FormlyFieldConf
 export class ArrayBuilder<T extends PrimitiveOrObject> implements Builder<FormlyFieldConfig> {
 
   protected _builder: Builder<any>;
-  private operations: MonoTypeOperatorFunction<FormlyFieldConfig>[];
+  private operations: MonoTypeOperatorFunction<FormlyArrayProps>[];
 
   constructor(public key: string | number | any) { }
 
@@ -225,7 +225,7 @@ export class ArrayBuilder<T extends PrimitiveOrObject> implements Builder<Formly
   public build(): FormlyFieldConfig {
     let props = {};
     if (this.operations?.length > 0) {
-      props = pipeFromArray<FormlyFieldConfig>(this.operations)(props);
+      props = pipeFromArray<FormlyArrayProps>(this.operations)(props);
     }
 
     let fieldArray: FormlyFieldConfig = this._builder.build();
@@ -238,7 +238,7 @@ export class ArrayBuilder<T extends PrimitiveOrObject> implements Builder<Formly
     return result;
   }
 
-  withProps(...operations: MonoTypeOperatorFunction<FormlyFieldConfig>[]): this {
+  withProps(...operations: MonoTypeOperatorFunction<FormlyArrayProps>[]): this {
     this.operations = operations;
     return this;
   }

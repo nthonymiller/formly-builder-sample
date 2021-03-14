@@ -1,11 +1,11 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { PropType } from '../types';
+import { MonoTypeOperatorFunction, PropType } from '../types';
 
-export function hideExpression<U = PropType<FormlyFieldConfig, 'hideExpression'>>(value: U) {
-  return <T extends Pick<FormlyFieldConfig, 'hideExpression'>>(configuration: T): T => {
+export function hideExpression<T extends Pick<FormlyFieldConfig, 'hideExpression'>, U = PropType<FormlyFieldConfig, 'hideExpression'>>(value: U): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       hideExpression: value
     };
-  }
+  };
 }

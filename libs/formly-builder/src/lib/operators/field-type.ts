@@ -1,10 +1,11 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { MonoTypeOperatorFunction } from '../types';
 
-export function fieldType(type: string) {
-  return <T extends Pick<FormlyFieldConfig, 'type'>>(configuration: T): T => {
+export function fieldType<T extends Pick<FormlyFieldConfig, 'type'>>(type: string): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       type
     };
-  }
+  };
 }

@@ -1,7 +1,7 @@
-import { FieldTemplateOptions } from '../types';
+import { FieldTemplateOptions, MonoTypeOperatorFunction } from '../types';
 
-export function max(value: number) {
-  return <T extends FieldTemplateOptions>(configuration: T): T => {
+export function max<T extends FieldTemplateOptions>(value: number): MonoTypeOperatorFunction<T> {
+  return (configuration: T): T => {
     return {
       ...configuration,
       templateOptions: {
@@ -9,5 +9,5 @@ export function max(value: number) {
         max: value
       }
     };
-  }
+  };
 }
